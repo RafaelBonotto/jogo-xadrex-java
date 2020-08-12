@@ -1,6 +1,7 @@
 package application;
 
 import xadrez.Cor;
+import xadrez.Partida;
 import xadrez.XadrezPeca;
 import xadrez.XadrezPosicao;
 
@@ -47,6 +48,13 @@ public class UI {
         catch (RuntimeException e){
             throw new InputMismatchException("Erro ao ler a posição de Xadrez! Valores válidos somente de a1 a h8.");
         }
+    }
+
+    public static void printPartida(Partida partida){
+        printTabuleiro(partida.getPecas());
+        System.out.println();
+        System.out.println("Turno: " + partida.getTurno());
+        System.out.println("Aguardando o jogador: " + partida.getJogadorAtual());
     }
 
     public static void printTabuleiro(XadrezPeca[][] pecas){
