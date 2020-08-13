@@ -6,11 +6,19 @@ import jogo.Tabuleiro;
 import xadrez.pecas.Rei;
 import xadrez.pecas.Torre;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Partida {
 
     private int turno;
     private Cor jogadorAtual;
     private Tabuleiro tabuleiro;
+    private boolean check;
+
+    private List<Peca> pecasNoTabuleiro = new ArrayList<>();
+    private List<Peca> pecasCapturadas = new ArrayList<>();
 
     public Partida(){
         tabuleiro = new Tabuleiro(8,8);
@@ -57,7 +65,24 @@ public class Partida {
         Peca p = tabuleiro.removerPeca(origem);
         Peca pecaCapturada = tabuleiro.removerPeca(destino);
         tabuleiro.colocarPeca(p, destino);
+
+        if(pecaCapturada != null){
+            pecasNoTabuleiro.remove(pecaCapturada);
+            pecasCapturadas.add(pecaCapturada);
+        }
+
         return pecaCapturada;
+    }
+
+    private void desfazerMovimento(Posicao origem, Posicao destino, Peca pecaCapturada){
+        Peca p = tabuleiro.removerPeca(destino);
+        tabuleiro.colocarPeca(p, origem);
+
+        if(pecaCapturada != null){
+            tabuleiro.colocarPeca(pecaCapturada,destino);
+            pecasCapturadas.remove(pecaCapturada);
+            pecasNoTabuleiro.add(pecaCapturada);
+        }
     }
 
     private void validarPosicaoOrigem(Posicao posicao){
@@ -83,9 +108,23 @@ public class Partida {
         jogadorAtual = (jogadorAtual == Cor.BRANCO) ? Cor.PRETO : Cor.BRANCO;
     }
 
+    private Cor oponente(Cor cor){
+        return (cor == Cor.BRANCO) ? Cor.PRETO : Cor.BRANCO;
+    }
+
+    private XadrezPeca rei (Cor cor){
+        List<Peca> lista = pecasNoTabuleiro.stream().filter(x -> ((XadrezPeca)x).getCor() == cor).collect(Collectors.toList());
+        for (Peca p : lista){
+            if (p instanceof Rei){
+                return (XadrezPeca)p;
+            }
+        }
+        throw new IllegalStateException("Não existe o Rei " + cor + " no tabuleiro!");
+    }
+
     private void colocarNovaPeca(char coluna, int linha, XadrezPeca peca){
         tabuleiro.colocarPeca(peca,new XadrezPosicao(coluna, linha).posicionar());
-
+        pecasNoTabuleiro.add(peca);
     }
 
     private void configInicial(){
