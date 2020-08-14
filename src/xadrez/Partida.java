@@ -35,6 +35,9 @@ public class Partida {
         return jogadorAtual;
     }
 
+    public boolean getCheck(){ return check; }
+
+
     public XadrezPeca[][] getPecas(){
         XadrezPeca[][] mat = new XadrezPeca[tabuleiro.getLinhas()][tabuleiro.getColunas()];
         for(int i = 0; i<tabuleiro.getLinhas(); i ++){
@@ -57,6 +60,12 @@ public class Partida {
         validarPosicaoOrigem(origem);
         validarPosicaoDestino(origem, destino);
         Peca pecaCapturada = movimento(origem, destino);
+        if(testarCheck(jogadorAtual)){
+            desfazerMovimento(origem, destino, pecaCapturada);
+            throw new XadrezExcepition("Você não pode se colocar em check!!");
+        }
+        check = (testarCheck(oponente(jogadorAtual))) ? true : false;
+
         proximoTurno();
         return (XadrezPeca)pecaCapturada;
     }
@@ -120,6 +129,19 @@ public class Partida {
             }
         }
         throw new IllegalStateException("Não existe o Rei " + cor + " no tabuleiro!");
+    }
+
+    private boolean testarCheck(Cor cor){
+        Posicao reiPosicao = rei(cor).getXadrezPosicao().posicionar();
+        List<Peca> pecaOponente = pecasNoTabuleiro.stream().filter(x -> ((XadrezPeca)x).getCor() == oponente(cor)).collect(Collectors.toList());
+        for(Peca p : pecaOponente){
+            boolean [][] mat = p.movimentosPossiveis();
+            if(mat[reiPosicao.getLinha()][reiPosicao.getColuna()]){
+                return true;
+            }
+
+        }
+        return false;
     }
 
     private void colocarNovaPeca(char coluna, int linha, XadrezPeca peca){
