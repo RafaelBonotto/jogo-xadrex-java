@@ -1,6 +1,5 @@
 package application;
 
-
 import xadrez.Partida;
 import xadrez.XadrezExcepition;
 import xadrez.XadrezPeca;
@@ -41,7 +40,11 @@ public class Main {
                 }
                 if(partida.getPromovido() != null){
                     System.out.println("Entre com a letra da peça para promoção: ('B' ou 'C' ou 'T' ou 'D'): ");
-                    String tipo = sc.nextLine();
+                    String tipo = sc.nextLine().toUpperCase();
+                    while(!tipo.equals("B") && !tipo.equals("C") && !tipo.equals("T") &&!tipo.equals("D")){
+                        System.out.println("Letra Inválida! Entre com a letra da peça para promoção! ('B' ou 'C' ou 'T' ou 'D'): ");
+                        tipo = sc.nextLine().toUpperCase();
+                    }
                     partida.substituirPecaPromovida(tipo);
                 }
             }
